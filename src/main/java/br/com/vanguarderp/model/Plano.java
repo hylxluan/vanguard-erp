@@ -1,5 +1,7 @@
 package br.com.vanguarderp.model;
 
+import java.io.Serializable;
+
 import br.com.vanguarderp.enums.TipoPlano;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +24,9 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "plano")
 @SequenceGenerator(name = "seq_plano", sequenceName = "seq_plano", 
 allocationSize = 1, initialValue = 1)
-public class Plano {
+public class Plano implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_plano")
@@ -30,14 +34,10 @@ public class Plano {
 	
 	@Column(nullable = false, length = 100, name = "nome")
 	@NotBlank(message = "O nome deve ser preenchido!")
-	@NotNull(message = "O nome não pode ser nulo!")
-	@NotEmpty(message = "O nome não pode estar vazio!")
 	private String nome;
 	
 	@Column(nullable = false, length = 100, name = "descricao")
 	@NotBlank(message = "A descrição deve ser informada!")
-	@NotNull(message = "A descrição não pode ser nula!")
-	@NotEmpty(message = "A descrição não pode estar vazia!")
 	private String descricao;
 	
 	@Column(name = "ativo", nullable = false)

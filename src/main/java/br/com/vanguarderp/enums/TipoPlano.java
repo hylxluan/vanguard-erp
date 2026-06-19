@@ -1,9 +1,12 @@
 package br.com.vanguarderp.enums;
 
 public enum TipoPlano {
+	
 	FREE("Plano Gratuito"),
+	STARTER("Plano Starter"),
 	PRO("Plano Profissional"),
-	ENTERPRISE("Plano Empresarial");
+	BUSINESS("Plano Empresarial"),
+	ENTERPRISE("Plano Corporativo");
 	
 	private final String description;
 
