@@ -65,11 +65,11 @@ public class Pessoa implements Serializable {
 	private String telefone;
 
 	@CPF(message = "Informe o CPF corretamente!")
-	@Column(name = "cpf", length = 20, nullable = false)
+	@Column(name = "cpf", length = 20, nullable = false, unique = true)
 	private String cpf;
 
 	@Email(message = "Informe o Email corretamente!")
-	@Column(name = "email", length = 150, nullable = false)
+	@Column(name = "email", length = 150, nullable = false, unique = true)
 	private String email;
 
 	@Column(name = "tipo_pessoa", nullable = false)
