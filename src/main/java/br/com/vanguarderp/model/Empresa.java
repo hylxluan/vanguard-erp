@@ -2,6 +2,7 @@ package br.com.vanguarderp.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -68,6 +69,10 @@ public class Empresa implements Serializable {
 			foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_fk"))
 	private Pessoa pessoa;
 
+	public Empresa() {
+		
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -138,6 +143,29 @@ public class Empresa implements Serializable {
 
 	public void setPessoa(Pessoa pessoa) {
 		this.pessoa = pessoa;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(bloqueio, id, logoMarca, pessoa, plano, planoAtivo, totalCliente, totalUsuarios,
+				vigenciaPlano);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Empresa other = (Empresa) obj;
+		return Objects.equals(bloqueio, other.bloqueio) && Objects.equals(id, other.id)
+				&& Objects.equals(logoMarca, other.logoMarca) && Objects.equals(pessoa, other.pessoa)
+				&& Objects.equals(plano, other.plano) && Objects.equals(planoAtivo, other.planoAtivo)
+				&& Objects.equals(totalCliente, other.totalCliente)
+				&& Objects.equals(totalUsuarios, other.totalUsuarios)
+				&& Objects.equals(vigenciaPlano, other.vigenciaPlano);
 	}
 	
 	

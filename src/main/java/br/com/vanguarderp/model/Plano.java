@@ -1,6 +1,7 @@
 package br.com.vanguarderp.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import br.com.vanguarderp.enums.TipoPlano;
 import jakarta.persistence.Column;
@@ -66,6 +67,10 @@ public class Plano implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private TipoPlano tipoPlano;
 
+	public Plano() {
+		
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -128,6 +133,26 @@ public class Plano implements Serializable {
 
 	public void setTipoPlano(TipoPlano tipoPlano) {
 		this.tipoPlano = tipoPlano;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ativo, descricao, id, limiteCliente, limiteUsuario, nome, tipoPlano, valorMensal);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Plano other = (Plano) obj;
+		return Objects.equals(ativo, other.ativo) && Objects.equals(descricao, other.descricao)
+				&& Objects.equals(id, other.id) && Objects.equals(limiteCliente, other.limiteCliente)
+				&& Objects.equals(limiteUsuario, other.limiteUsuario) && Objects.equals(nome, other.nome)
+				&& tipoPlano == other.tipoPlano && Objects.equals(valorMensal, other.valorMensal);
 	}
 	
 	

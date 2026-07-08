@@ -2,6 +2,7 @@ package br.com.vanguarderp.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CNPJ.Format;
@@ -122,6 +123,10 @@ public class Pessoa implements Serializable {
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "pessoa_empresa_fk"))
 	private Empresa empresa;
 
+	public Pessoa() {
+		
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -289,5 +294,36 @@ public class Pessoa implements Serializable {
 	public void setEmpresa(Empresa empresa) {
 		this.empresa = empresa;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(ativo, bairro, cep, cidade, cnpj, complemento, cpf, dataCadastro, email, empresa, estado,
+				id, inscricaoEstadual, logradouro, nome, nomeFantasia, observacao, pais, razaoSocial, telefone,
+				tipoPessoa);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pessoa other = (Pessoa) obj;
+		return Objects.equals(ativo, other.ativo) && Objects.equals(bairro, other.bairro)
+				&& Objects.equals(cep, other.cep) && Objects.equals(cidade, other.cidade)
+				&& Objects.equals(cnpj, other.cnpj) && Objects.equals(complemento, other.complemento)
+				&& Objects.equals(cpf, other.cpf) && Objects.equals(dataCadastro, other.dataCadastro)
+				&& Objects.equals(email, other.email) && Objects.equals(empresa, other.empresa)
+				&& Objects.equals(estado, other.estado) && Objects.equals(id, other.id)
+				&& Objects.equals(inscricaoEstadual, other.inscricaoEstadual)
+				&& Objects.equals(logradouro, other.logradouro) && Objects.equals(nome, other.nome)
+				&& Objects.equals(nomeFantasia, other.nomeFantasia) && Objects.equals(observacao, other.observacao)
+				&& Objects.equals(pais, other.pais) && Objects.equals(razaoSocial, other.razaoSocial)
+				&& Objects.equals(telefone, other.telefone) && tipoPessoa == other.tipoPessoa;
+	}
+	
+	
 
 }
