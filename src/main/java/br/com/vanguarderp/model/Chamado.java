@@ -55,7 +55,7 @@ public class Chamado implements Serializable {
 	@NotNull(message = "O status não pode ser nulo!")
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private StatusChamado status = StatusChamado.ABERTO;
+	private StatusChamado status;
 
 	@NotNull(message = "A prioridade deve ser informada!")
 	@Enumerated(EnumType.STRING)
