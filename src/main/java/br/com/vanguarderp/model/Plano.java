@@ -13,12 +13,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -46,8 +43,8 @@ public class Plano implements Serializable {
 	
 	@Column(name = "valor_mensal", nullable = false)
 	@NotNull(message = "O valor mensal não pode ser nulo!")
-	@DecimalMin(value = "49.0", message = "O valor mínimo mensal do plano deve ser de R$49,00 reais!")
-	@DecimalMax(value = "299.0", message = "O valor máximo mensal do plano deve ser de R$299,00 reais!")
+	@Min(value = 49, message = "O valor mínimo mensal do plano deve ser de R$49,00 reais!")
+	@Max(value = 299, message = "O valor máximo mensal do plano deve ser de R$299,00 reais!")
 	private Double valorMensal;
 	
 	@Column(name = "limite_usuario", nullable = false)
