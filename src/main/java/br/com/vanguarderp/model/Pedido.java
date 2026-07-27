@@ -85,8 +85,9 @@ public class Pedido implements Serializable {
 
 	@Column(name = "taxas")
 	private BigDecimal taxas = BigDecimal.ZERO;
-
-	@Column(name = "total")
+	
+	@NotNull(message = "O total não pode ser nulo!")
+	@Column(name = "total", nullable = false)
 	private BigDecimal total = BigDecimal.ZERO;
 
 	@Column(name = "observacao", columnDefinition = "text")

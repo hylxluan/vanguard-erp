@@ -35,7 +35,6 @@ public class Mensagem implements Serializable {
 	@Column(name = "data_envio", nullable = false)
 	private LocalDateTime dataEnvio;
 
-	@NotNull(message = "O campo lida não pode ser nulo!")
 	@Column(name = "lida", nullable = false)
 	private Boolean lida = false;
 

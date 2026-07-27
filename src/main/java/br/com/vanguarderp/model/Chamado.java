@@ -88,7 +88,8 @@ public class Chamado implements Serializable {
 	private Usuario usuarioAbertura;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "usuario_fechamento_id",
+	@JoinColumn(name = "usuario_fechamento_id", 
+	nullable = true,
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "usuario_fechamento_fk"))
 	private Usuario usuarioFechamento;
 
