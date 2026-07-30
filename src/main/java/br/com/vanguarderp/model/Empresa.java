@@ -145,29 +145,5 @@ public class Empresa implements Serializable {
 		this.pessoa = pessoa;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(bloqueio, id, logoMarca, pessoa, plano, planoAtivo, totalCliente, totalUsuarios,
-				vigenciaPlano);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Empresa other = (Empresa) obj;
-		return Objects.equals(bloqueio, other.bloqueio) && Objects.equals(id, other.id)
-				&& Objects.equals(logoMarca, other.logoMarca) && Objects.equals(pessoa, other.pessoa)
-				&& Objects.equals(plano, other.plano) && Objects.equals(planoAtivo, other.planoAtivo)
-				&& Objects.equals(totalCliente, other.totalCliente)
-				&& Objects.equals(totalUsuarios, other.totalUsuarios)
-				&& Objects.equals(vigenciaPlano, other.vigenciaPlano);
-	}
-	
-	
 	
 }
