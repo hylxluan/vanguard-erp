@@ -1,11 +1,14 @@
 package br.com.vanguarderp.repository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
@@ -45,6 +48,18 @@ public class JpaVanguardRepositoryImpl<T, ID extends Serializable>
 		
 		if (possuiEmpresa) {
 			jpql += " WHERE empresa.id = : empresaId";
+		}
+		
+		if (pageable.getSort().isSorted()) {
+			jpql += " order by ";
+			
+			List<String> orders = new ArrayList<>();
+			
+			for (Order order : pageable.getSort()) {
+				orders.add(order.getProperty() + " " + order.getDirection().name());
+			}
+			
+			jpql += String.join(",", orders);
 		}
 		
 		TypedQuery<T> query = entityManager.createQuery(jpql, domainClass);

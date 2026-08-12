@@ -156,9 +156,9 @@ public class TestCategoriaRepository extends TestSpringContext {
 		System.out.println(categoriasPaginadas);
 		
 		if (pageable.getPageNumber() == 2) {
-			assertEquals("Ferramentas Elétricas", categoriasPaginadas.getContent().get(2).getNome());
+			assertEquals("Instrumentos Musicais", categoriasPaginadas.getContent().get(2).getNome());
 		} else {
-			assertEquals("Eletrônicos", categoriasPaginadas.getContent().get(1).getNome());
+			assertEquals("Papelaria", categoriasPaginadas.getContent().get(1).getNome());
 		}
 		
 		
