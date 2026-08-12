@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import br.com.vanguarderp.context.TestSpringContext;
 import br.com.vanguarderp.model.Categoria;
@@ -137,6 +141,26 @@ public class TestCategoriaRepository extends TestSpringContext {
 		System.out.println("Existe por Nome DeleteByIdEmpresa: " + existeCategoria);
 		
 		assertFalse(existeCategoria);
+		
+	}
+	
+	
+	@Test
+	public void testListaPaginada() {
+		Empresa empresa = empresaRepository.findById(1L).get();
+		Pageable pageable = PageRequest.of(2, 10, Sort.by(Sort.Direction.DESC, "nome"));
+		
+		Page<Categoria> categoriasPaginadas = categoriaRepository.listarPaginado(empresa.getId(), pageable);
+		
+		
+		System.out.println(categoriasPaginadas);
+		
+		if (pageable.getPageNumber() == 2) {
+			assertEquals("Ferramentas Elétricas", categoriasPaginadas.getContent().get(2).getNome());
+		} else {
+			assertEquals("Eletrônicos", categoriasPaginadas.getContent().get(1).getNome());
+		}
+		
 		
 	}
 }
