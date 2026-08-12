@@ -2,6 +2,7 @@ package br.com.vanguarderp.repository;
 
 import java.util.List;
 
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,4 +43,8 @@ public interface CategoriaRepository extends JpaVanguardRepository<Categoria, Lo
 	@Query("delete from Categoria c where c.empresa.id = :idEmpresa and " +
 		   " c.id = :id")
 	void deleteByIdAndEmpresa(@Param("id") Long id, @Param("idEmpresa") Long idEmpresa);
+
+	
+	
+	
 }

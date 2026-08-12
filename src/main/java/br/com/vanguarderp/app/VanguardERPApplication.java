@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import br.com.vanguarderp.repository.JpaVanguardRepositoryImpl;
 import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication
@@ -25,7 +26,8 @@ import jakarta.annotation.PostConstruct;
 @EnableAsync
 @EnableTransactionManagement
 @EntityScan(basePackages = "br.com.vanguarderp.model")
-@EnableJpaRepositories(basePackages = "br.com.vanguarderp.repository")
+@EnableJpaRepositories(basePackages = "br.com.vanguarderp.repository", 
+repositoryBaseClass = JpaVanguardRepositoryImpl.class)
 @ComponentScan(basePackages = "br.com.vanguarderp")
 
 public class VanguardERPApplication {
