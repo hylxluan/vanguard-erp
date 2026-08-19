@@ -4,13 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.jpa.domain.PredicateSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -23,6 +29,8 @@ public class JpaVanguardRepositoryImpl<T, ID extends Serializable>
 	private final Class<T> domainClass;
 	private final EntityManager entityManager;
 	private final boolean isMultiEmpresa;
+	private static final String MSG_BLOQUEIO_QUERY = 
+			"Use ou crie um método que tenha o empresa.id incluída para a separação dos dados por empresa e ativar o multitanent.";
 	
 	public JpaVanguardRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
 		super(domainClass, entityManager);
@@ -218,6 +226,175 @@ public class JpaVanguardRepositoryImpl<T, ID extends Serializable>
 			return false;
 		}
 		
+	}
+	
+	@Override
+	public List<T> findAll() {
+		validar("findAll");
+		return super.findAll();
+	}
+	
+	@Override
+	public List<T> findAll(Sort sort) {
+		validar("findAll");
+		return super.findAll(sort);
+	}
+	
+	@Override
+	public Page<T> findAll(Pageable pageable) {
+		validar("findAll");
+		return super.findAll(pageable);
+	}
+	
+	@Override
+	public <S extends T> List<S> findAll(Example<S> example) {
+		validar("findAll");
+		return super.findAll(example);
+	}
+	
+	
+	@Override
+	public <S extends T> Page<S> findAll(Example<S> example, Pageable pageable) {
+		validar("findAll");
+		return super.findAll(example, pageable);
+	}
+
+	@Override
+	public <S extends T> List<S> findAll(Example<S> example, Sort sort) {
+		validar("findAll");
+		return super.findAll(example, sort);
+	}
+	
+	
+	@Override
+	public List<T> findAll(PredicateSpecification<T> spec) {
+		validar("findAll");
+		return super.findAll(spec);
+	}
+	
+	
+	@Override
+	public List<T> findAll(Specification<T> spec) {
+		validar("findAll");
+		return super.findAll(spec);
+	}
+
+	@Override
+	public Page<T> findAll(Specification<T> spec, Pageable pageable) {
+		validar("findAll");
+		return super.findAll(spec, pageable);
+	}
+
+	@Override
+	public List<T> findAll(Specification<T> spec, Sort sort) {
+		validar("findAll");
+		return super.findAll(spec, sort);
+	}
+
+	@Override
+	public Page<T> findAll(Specification<T> spec, Specification<T> countSpec, Pageable pageable) {
+		validar("findAll");
+		return super.findAll(spec, countSpec, pageable);
+	}
+
+	@Override
+	public Optional<T> findById(ID id) {
+		validar("findById");
+		return super.findById(id);
+	}
+
+	@Override
+	public List<T> findAllById(Iterable<ID> ids) {
+		validar("findAllById");
+		return super.findAllById(ids);
+	}
+	
+	
+	@Override
+	public T getReferenceById(ID id) {
+		validar("getReferenceById");
+		return super.getReferenceById(id);
+	}
+	
+	@Override
+	public boolean existsById(ID id) {
+		validar("existsById");
+		return super.existsById(id);
+	}
+	
+	@Override
+	public long count() {
+		validar("count");
+		return super.count();
+	}
+
+	@Override
+	public <S extends T> long count(Example<S> example) {
+		validar("count");
+		return super.count(example);
+	}
+
+	@Override
+	public long count(PredicateSpecification<T> spec) {
+		validar("count");
+		return super.count(spec);
+	}
+
+	@Override
+	public long count(Specification<T> spec) {
+		validar("count");
+		return super.count(spec);
+	}
+	
+	
+	@Override
+	public void delete(T entity) {
+		validar("delete");
+		super.delete(entity);
+	}
+
+	@Override
+	public void deleteAll() {
+		validar("delete");
+		super.deleteAll();
+	}
+	
+	@Override
+	public void deleteById(ID id) {
+		validar("deleteById");
+		super.deleteById(id);
+	}
+	
+	@Override
+	public <S extends T> Optional<S> findOne(Example<S> example) {
+		validar("findOne");
+		return super.findOne(example);
+	}
+	
+	@Override
+	public <S extends T> boolean exists(Example<S> example) {
+		validar("exists");
+		return super.exists(example);
+	}
+	
+	@Override
+	public void deleteAllInBatch() {
+		validar("deleteAllInBatch");
+		super.deleteAllInBatch();
+	}
+	
+	
+	
+	@Override
+	public <S extends T, R> R findBy(Example<S> example, Function<FetchableFluentQuery<S>, R> queryFunction) {
+		validar("findBy");
+		return super.findBy(example, queryFunction);
+	}
+
+	private void validar(String metodo) {
+		if (isMultiEmpresa) {
+			throw new UnsupportedOperationException("o método: " + metodo + " não pode ser usado. " + MSG_BLOQUEIO_QUERY);
+		}
 	}
 	
 }
