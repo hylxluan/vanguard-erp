@@ -20,20 +20,21 @@ public interface CategoriaRepository extends JpaVanguardRepository<Categoria, Lo
 	
 	
 	@Query("select c from Categoria c where c.empresa.id = :idEmpresa " +
-			" and upper(trim(c.nome)) " + 
-			" like upper(concat('%', trim(:nomeCategoria), '%'))")
+			" and unaccent(upper(trim(c.nome))) " + 
+			" like unaccent(upper(concat('%', trim(:nomeCategoria), '%')))")
 	List<Categoria> buscarPorNome(@Param("nomeCategoria") String nome, @Param("idEmpresa") Long idEmpresa);
 	
 	
 	@Query("select count(c.id) > 0 from Categoria c " +
 		   "where c.empresa.id = :idEmpresa and " +
-		   "upper(trim(c.nome)) " + 
-		   " = upper(trim(:nomeCategoria))")
+		   "unaccent(upper(trim(c.nome))) " + 
+		   " = unaccent(upper(trim(:nomeCategoria)))")
 	boolean existePorNome(@Param("nomeCategoria") String nome, @Param("idEmpresa") Long idEmpresa);
 	
 	
 	@Query("select count(c.id) > 0 from Categoria c where c.empresa.id = :idEmpresa " +
-		   " and upper(trim(c.nome)) = upper(trim(:nomeCategoria)) and c.id <> :id")
+		   " and unaccent(upper(trim(c.nome))) = "
+		   + "unaccent(upper(trim(:nomeCategoria))) and c.id <> :id")
 	boolean existePorNomeDiferenteId(@Param("id") Long id, @Param("nomeCategoria") String nome, 
 									 @Param("idEmpresa") Long idEmpresa);
 	

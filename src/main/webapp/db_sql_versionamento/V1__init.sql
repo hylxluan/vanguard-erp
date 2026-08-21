@@ -113,3 +113,5 @@ INSERT INTO public.categoria (id, nome, empresa_id) VALUES
 (nextval('seq_categoria'), 'Alimentos e Mercearia', 1),
 (nextval('seq_categoria'), 'Limpeza', 1),
 (nextval('seq_categoria'), 'Segurança e Vigilância', 1);
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
