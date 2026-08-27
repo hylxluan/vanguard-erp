@@ -43,35 +43,35 @@ public class CategoriaService {
 		categoriaRepository.deleteByIdAndEmpresa(id, idEmpresa);
 	}
 	
-	Page<Categoria> listarCategoriasPaginado(Long empresaId, Pageable pageable) {
+	public Page<Categoria> listarCategoriasPaginado(Long empresaId, Pageable pageable) {
 		return categoriaRepository.listarPaginado(empresaId, pageable);
 	}
 	
-	long totalCategorias(Long empresaId) {
+	public long totalCategorias(Long empresaId) {
 		return categoriaRepository.total(empresaId);
 	}
 	
-	Optional<Categoria> buscarCategoriaPorId(Long id, Long empresaId) {
+	public Optional<Categoria> buscarCategoriaPorId(Long id, Long empresaId) {
 		return categoriaRepository.buscarPorId(id, empresaId);
 	}
 	
-	List<Categoria> buscarCategoriasPorIds(Iterable<Long> ids, Long empresaId) {
+	public List<Categoria> buscarCategoriasPorIds(Iterable<Long> ids, Long empresaId) {
 		return categoriaRepository.buscarPorIds(ids, empresaId);
 	}
 	
-	boolean existeCategoriaPorId(Long id, Long empresaId) {
+	public boolean existeCategoriaPorId(Long id, Long empresaId) {
 		return categoriaRepository.existePorId(id, empresaId);
 	}
 	
-	List<Categoria> listarCategorias(Long empresaId) {
+	public List<Categoria> listarCategorias(Long empresaId) {
 		return categoriaRepository.listar(empresaId);
 	}
 	
-	long deletarCategoriasPorIds(Iterable<Long> ids, Long empresaId) {
+	public long deletarCategoriasPorIds(Iterable<Long> ids, Long empresaId) {
 		return categoriaRepository.deletarAllPorIds(ids, empresaId);
 	}
 	
-	long deletarTodasCategorias(Long empresaId) {
+	public long deletarTodasCategorias(Long empresaId) {
 		return categoriaRepository.deletarAll(empresaId);
 	}
 	
