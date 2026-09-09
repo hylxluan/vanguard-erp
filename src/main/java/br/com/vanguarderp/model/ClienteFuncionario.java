@@ -60,7 +60,7 @@ public class ClienteFuncionario implements Serializable {
 	
 	@NotNull(message = "Usuário deve ser informado")
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "usuario_id", nullable = false,
+	@JoinColumn(name = "usuario_id", nullable = true,
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "usuario_fk"))
 	private Usuario usuario;
 

@@ -56,7 +56,10 @@ public class Usuario implements UserDetails, Serializable {
 	@Column(name = "bloqueio", nullable = false)
 	private Boolean bloqueio = false;
 	
+	@Column(name = "access_token", columnDefinition = "TEXT")	
 	private String accessToken;
+	
+	@Column(name = "refresh_token", columnDefinition = "TEXT")
 	private String refreshToken;
 	
 	@NotNull(message = "Cliente ou Funcionário deve ser informado para cadastrar o usuário de acesso no sistema!")

@@ -115,3 +115,24 @@ INSERT INTO public.categoria (id, nome, empresa_id) VALUES
 (nextval('seq_categoria'), 'Segurança e Vigilância', 1);
 
 CREATE EXTENSION IF NOT EXISTS unaccent;
+
+INSERT INTO role(
+	id, acesso)
+	VALUES (1, 'ROLE_USER');
+
+select nextval('seq_role');
+
+INSERT INTO role(
+	id, acesso)
+	VALUES (2, 'ROLE_ADMIN');
+
+select nextval('seq_role');
+
+ALTER TABLE cliente_funcionario
+    ALTER COLUMN usuario_id DROP NOT NULL;
+
+
+
+ALTER TABLE IF EXISTS usuario
+    ALTER COLUMN refresh_token TYPE TEXT,
+    ALTER COLUMN access_token TYPE TEXT;
