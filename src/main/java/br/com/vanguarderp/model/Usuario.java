@@ -180,27 +180,14 @@ public class Usuario implements UserDetails, Serializable {
 		this.clienteFuncionario = clienteFuncionario;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(accessToken, acessos, bloqueio, clienteFuncionario, empresa, id, login, refreshToken,
-				senha);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
+	public boolean isAdmin() {
+		
+		if (this.acessos == null || this.acessos.isEmpty()) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Usuario other = (Usuario) obj;
-		return Objects.equals(accessToken, other.accessToken) && Objects.equals(acessos, other.acessos)
-				&& Objects.equals(bloqueio, other.bloqueio)
-				&& Objects.equals(clienteFuncionario, other.clienteFuncionario)
-				&& Objects.equals(empresa, other.empresa) && Objects.equals(id, other.id)
-				&& Objects.equals(login, other.login) && Objects.equals(refreshToken, other.refreshToken)
-				&& Objects.equals(senha, other.senha);
+		}
+		
+		return this.acessos.stream()
+						   .anyMatch(role -> role.getAcesso().equalsIgnoreCase("ROLE_ADMIN"));
 	}
 	
 	
