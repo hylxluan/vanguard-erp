@@ -26,7 +26,7 @@ public class ClienteFuncionarioService {
 		return clienteFuncionarioRepository.findAll(idEmpresa);
 	}
 
-	public ClienteFuncionario getFindByPessoa(Long idPessoa, Long idEmpresa) {
+	public ClienteFuncionario findByPessoa(Long idPessoa, Long idEmpresa) {
 		return clienteFuncionarioRepository.findByPessoa(idPessoa, idEmpresa);
 	}
 
@@ -40,6 +40,10 @@ public class ClienteFuncionarioService {
 
 	public boolean existeClienteFuncionarioPorNomeDiferenteId(Long id, String nome, Long idEmpresa) {
 		return clienteFuncionarioRepository.existePorNomeDiferenteId(id, nome, idEmpresa);
+	}
+	
+	public ClienteFuncionario salvar(ClienteFuncionario clienteFuncionario) {
+		return clienteFuncionarioRepository.saveAndFlush(clienteFuncionario);
 	}
 
 	public void deleteClienteFuncionarioByIdAndEmpresa(Long id, Long idEmpresa) {
