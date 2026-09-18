@@ -5,11 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import br.com.vanguarderp.exceptions.MsgApiException;
 import br.com.vanguarderp.model.Usuario;
 import br.com.vanguarderp.repository.UsuarioRepository;
 
+@Service
 public class UsuarioDetailsService implements UserDetailsService {
 
 	@Autowired
