@@ -15,7 +15,7 @@ public class UsuarioAutenticado implements UserDetails {
 	private final Usuario usuario;
 	
 	
-	private UsuarioAutenticado(Usuario usuario) {
+	public UsuarioAutenticado(Usuario usuario) {
 		this.usuario = usuario;
 	}
 	
