@@ -136,3 +136,39 @@ ALTER TABLE cliente_funcionario
 ALTER TABLE IF EXISTS usuario
     ALTER COLUMN refresh_token TYPE TEXT,
     ALTER COLUMN access_token TYPE TEXT;
+    
+INSERT INTO public.cliente_funcionario(
+	id, 
+	tipo_cliente_funcionario, 
+	empresa_id, 
+	pessoa_id,
+	usuario_id)
+	VALUES (1, 'FUNCIONARIO', 1, 1, null);
+
+select nextval('seq_cliente_funcionario');
+
+
+
+/*Senha de teste: sport clube do recife */
+
+INSERT INTO public.usuario(
+	id,
+	bloqueio, 
+	login, 
+	refresh_token, 
+	senha, 
+	access_token, 
+	cliente_funcionario_id, 
+	empresa_id)
+	VALUES (1, false, 'luanplays212004@gmail.com', '', '$argon2id$v=19$m=15360,t=2,p=1$elYOzHFcPw43YCruBScP1wRljU40bpkElVtqTjXza5tEZ+nX1Zhh+KP9/mtFGaTCfWWpQwKR0+ZRov/a6DPhRw$0D2aEW9OQ3DozmeiTIM2j/nHvpGejgIhABwa6+TQnEg', '', 1, 1);
+	
+	select nextval('seq_usuario');
+	
+	
+update cliente_funcionario SET usuario_id = 1 where id =1;
+
+
+INSERT INTO public.role_usuario(
+	id, acesso_id, usuario_id)
+	VALUES (1, 2, 1);
+	select nextval('seq_role_usuario');
