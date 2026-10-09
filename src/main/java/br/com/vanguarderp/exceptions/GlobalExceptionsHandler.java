@@ -31,6 +31,7 @@ public class GlobalExceptionsHandler {
 
     @ExceptionHandler(MsgApiException.class)
     public ResponseEntity<ResponseApi> generalMsgApiExceptions(MsgApiException msgApiException, HttpServletRequest httpServletRequest) {
+        logException(msgApiException, httpServletRequest);
 
         ResponseApi responseApi = new ResponseApi(
                 new Date(),
@@ -46,6 +47,7 @@ public class GlobalExceptionsHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ResponseApi> userNotFoundExceptions(UsernameNotFoundException ex, HttpServletRequest httpServletRequest) {
+        logException(ex, httpServletRequest);
 
         ResponseApi responseApi = new ResponseApi(
                 new Date(),
