@@ -17,4 +17,11 @@ public class MsgApiException extends RuntimeException {
 		this.status = HttpStatus.BAD_REQUEST;
 	}
 
+	public HttpStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(HttpStatus status) {
+		this.status = status;
+	}
 }
