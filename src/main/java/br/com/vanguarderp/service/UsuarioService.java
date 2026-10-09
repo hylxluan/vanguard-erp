@@ -59,8 +59,15 @@ public class UsuarioService {
 		if (usuario == null) {
 			throw new MsgApiException("Usuário não encontrado", HttpStatus.UNAUTHORIZED);
 		}
-		
-		
+
+		if (!usuario.isEnabled()) {
+			throw new MsgApiException("Usuário está bloqueado ou inativo!", HttpStatus.FORBIDDEN);
+		}
+
+		if (usuario.getEmpresa().getBloqueio()) {
+			throw new MsgApiException("Empresa do usuário está bloqueada!", HttpStatus.FORBIDDEN);
+		}
+
 		if (!passwordEncoder.matches(login.getSenha(), usuario.getSenha())) {
 			throw new MsgApiException("Senha inválida", HttpStatus.UNAUTHORIZED);
 		}

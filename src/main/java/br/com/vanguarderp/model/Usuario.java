@@ -52,9 +52,9 @@ public class Usuario implements UserDetails, Serializable {
 	@Column(name = "senha", nullable = false)
 	private String senha;
 	
-	@NotNull(message = "Bloqueio não pode ser nulo!")
-	@Column(name = "bloqueio", nullable = false)
-	private Boolean bloqueio = false;
+	@NotNull(message = "Liberado não pode ser nulo!")
+	@Column(name = "liberado", nullable = false)
+	private Boolean liberado = true;
 	
 	@Column(name = "access_token", columnDefinition = "TEXT")	
 	private String accessToken;
@@ -132,12 +132,14 @@ public class Usuario implements UserDetails, Serializable {
 		this.senha = senha;
 	}
 
-	public Boolean getBloqueio() {
-		return bloqueio;
+	
+
+	public Boolean getLiberado() {
+		return liberado;
 	}
 
-	public void setBloqueio(Boolean bloqueio) {
-		this.bloqueio = bloqueio;
+	public void setLiberado(Boolean liberado) {
+		this.liberado = liberado;
 	}
 
 	public String getAccessToken() {
@@ -178,6 +180,12 @@ public class Usuario implements UserDetails, Serializable {
 
 	public void setClienteFuncionario(ClienteFuncionario clienteFuncionario) {
 		this.clienteFuncionario = clienteFuncionario;
+	}
+
+	@Override
+	public boolean isEnabled() {
+
+		return liberado;
 	}
 
 	public boolean isAdmin() {

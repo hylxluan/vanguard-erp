@@ -153,14 +153,14 @@ select nextval('seq_cliente_funcionario');
 
 INSERT INTO public.usuario(
 	id,
-	bloqueio, 
-	login, 
+	liberado,
+	login,
 	refresh_token, 
 	senha, 
 	access_token, 
 	cliente_funcionario_id, 
 	empresa_id)
-	VALUES (1, false, 'luanplays212004@gmail.com', '', '$argon2id$v=19$m=15360,t=2,p=1$elYOzHFcPw43YCruBScP1wRljU40bpkElVtqTjXza5tEZ+nX1Zhh+KP9/mtFGaTCfWWpQwKR0+ZRov/a6DPhRw$0D2aEW9OQ3DozmeiTIM2j/nHvpGejgIhABwa6+TQnEg', '', 1, 1);
+	VALUES (1, true, 'luanplays212004@gmail.com', '', '$argon2id$v=19$m=19456,t=2,p=1$h55mNr9p4WLZdKJPl+FWRw$Co3DLQBZNFuNWvmAZZqIivAg48mIpOYyId+Msxg5nZs', '', 1, 1);
 	
 	select nextval('seq_usuario');
 	
