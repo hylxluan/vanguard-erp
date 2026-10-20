@@ -1,17 +1,16 @@
 package br.com.vanguarderp.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.vanguarderp.dto.LoginDTO;
 import br.com.vanguarderp.dto.TokenDTO;
+import br.com.vanguarderp.dto.UsuarioDTO;
 import br.com.vanguarderp.service.UsuarioLogadoService;
 import br.com.vanguarderp.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuario")
@@ -29,6 +28,12 @@ public class UsuarioController {
 		TokenDTO token = usuarioService.login(loginDTO);
 		
 		return ResponseEntity.ok(token);
+	}
+
+
+	@GetMapping("/listar")
+	public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+		return ResponseEntity.ok(usuarioService.listarUsuarios(usuarioLogadoService.getIdEmpresaLogada()));
 	}
 
 }

@@ -1,33 +1,17 @@
 package br.com.vanguarderp.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "usuario", uniqueConstraints = {
@@ -43,25 +27,31 @@ public class Usuario implements UserDetails, Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
 	private Long id;
-	
+
+	@JsonIgnore
 	@NotBlank(message = "Login deve ser informado!")
 	@Column(name = "login", nullable = false, unique = true)
 	private String login;
-	
+
+	@JsonIgnore
 	@NotBlank(message = "Senha deve ser informada!")
 	@Column(name = "senha", nullable = false)
 	private String senha;
-	
+
+	@JsonIgnore
 	@NotNull(message = "Liberado não pode ser nulo!")
 	@Column(name = "liberado", nullable = false)
 	private Boolean liberado = true;
-	
+
+	@JsonIgnore
 	@Column(name = "access_token", columnDefinition = "TEXT")	
 	private String accessToken;
-	
+
+	@JsonIgnore
 	@Column(name = "refresh_token", columnDefinition = "TEXT")
 	private String refreshToken;
-	
+
+
 	@NotNull(message = "Cliente ou Funcionário deve ser informado para cadastrar o usuário de acesso no sistema!")
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cliente_funcionario_id", 
@@ -69,7 +59,8 @@ public class Usuario implements UserDetails, Serializable {
 			value = ConstraintMode.CONSTRAINT, name = "cliente_funcionario_fk"),
 	nullable = false)
 	private ClienteFuncionario clienteFuncionario;
-	
+
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "role_usuario", 
 		joinColumns = @JoinColumn(name = "usuario_id",
@@ -86,13 +77,14 @@ public class Usuario implements UserDetails, Serializable {
 	nullable = false, 
 	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
 	private Empresa empresa;
-	
-	
+
+	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return this.acessos;
 	}
 
+	@JsonIgnore
 	@Override
 	public @Nullable String getPassword() {
 		return this.senha;
@@ -103,7 +95,9 @@ public class Usuario implements UserDetails, Serializable {
 		return this.login;
 	}
 
-	
+
+
+
 	public Usuario() {
 
 	}
@@ -187,6 +181,9 @@ public class Usuario implements UserDetails, Serializable {
 
 		return liberado;
 	}
+
+
+
 
 	public boolean isAdmin() {
 		

@@ -1,20 +1,21 @@
 package br.com.vanguarderp.repository;
 
-import java.util.List;
-
+import br.com.vanguarderp.annotations.IgnoreEmpresaId;
+import br.com.vanguarderp.model.Usuario;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.com.vanguarderp.annotations.IgnoreEmpresaId;
-import br.com.vanguarderp.model.Usuario;
-import jakarta.transaction.Transactional;
+import java.util.List;
 
 @Repository
 public interface UsuarioRepository extends JpaVanguardRepository<Usuario, Long> {
 
 	@IgnoreEmpresaId(ignore = true, motivo = "Busca de usuário pelo login para então associar à sua empresa")
+	@EntityGraph(attributePaths = {"empresa", "acessos"})
 	@Query("select u from Usuario u where u.login = :login")
 	Usuario buscarPorLogin(@Param("login") String login);
 	
