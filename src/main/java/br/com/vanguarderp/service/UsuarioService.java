@@ -11,6 +11,7 @@ import br.com.vanguarderp.model.Usuario;
 import br.com.vanguarderp.repository.UsuarioRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -224,7 +225,9 @@ public class UsuarioService {
 		return usuarioRepository.existeOutroUsuarioComPessoa(pessoaId, usuarioId, idEmpresa);
 	}
 
+	@Transactional
 	public void deleteUsuarioByIdAndEmpresa(Long id, Long idEmpresa) {
+		clienteFuncionarioService.removeUsuarioClienteFuncionario(id, idEmpresa);
 		usuarioRepository.deleteById(id, idEmpresa);
 	}
 

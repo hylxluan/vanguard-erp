@@ -1,17 +1,16 @@
 package br.com.vanguarderp.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import br.com.vanguarderp.model.ClienteFuncionario;
+import br.com.vanguarderp.repository.ClienteFuncionarioRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.com.vanguarderp.model.ClienteFuncionario;
-import br.com.vanguarderp.repository.ClienteFuncionarioRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClienteFuncionarioService {
@@ -81,5 +80,10 @@ public class ClienteFuncionarioService {
 	public long deletarTodosClientesFuncionarios(Long empresaId) {
 		return clienteFuncionarioRepository.deletarAll(empresaId);
 	}
+
+	public void removeUsuarioClienteFuncionario(Long id, Long idEmpresa) {
+		clienteFuncionarioRepository.removeUsuarioClienteFuncionario(id, idEmpresa);
+	}
+
 
 }

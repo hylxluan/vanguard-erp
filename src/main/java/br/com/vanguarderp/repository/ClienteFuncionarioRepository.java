@@ -1,14 +1,13 @@
 package br.com.vanguarderp.repository;
 
-import java.util.List;
-
+import br.com.vanguarderp.model.ClienteFuncionario;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.com.vanguarderp.model.ClienteFuncionario;
-import jakarta.transaction.Transactional;
+import java.util.List;
 
 @Repository
 public interface ClienteFuncionarioRepository extends JpaVanguardRepository<ClienteFuncionario, Long> {
@@ -38,5 +37,11 @@ public interface ClienteFuncionarioRepository extends JpaVanguardRepository<Clie
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from ClienteFuncionario c where c.empresa.id = :idEmpresa and c.id = :id")
     void deleteById(@Param("id") Long id, @Param("idEmpresa") Long idEmpresa);
+
+    @Transactional
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update ClienteFuncionario cf set cf.usuario = null where cf.empresa.id = :idEmpresa and cf.usuario.id = :idUsuario")
+    void removeUsuarioClienteFuncionario(@Param("idUsuario") Long idUsuario, @Param("idEmpresa") Long idEmpresa);
+
 
 }

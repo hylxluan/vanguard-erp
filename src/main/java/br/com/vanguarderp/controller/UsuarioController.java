@@ -42,4 +42,10 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioService.buscarUsuarioDtoPorId(id, usuarioLogadoService.getIdEmpresaLogada()));
 	}
 
+	@DeleteMapping("/deletarPorId/{id}")
+	public ResponseEntity<String> deletarPorId(@PathVariable(required = true) Long id) {
+		usuarioService.deleteUsuarioByIdAndEmpresa(id, usuarioLogadoService.getIdEmpresaLogada());
+		return ResponseEntity.ok("Usuario deletado com sucesso");
+	}
+
 }
