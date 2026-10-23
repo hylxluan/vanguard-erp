@@ -244,6 +244,26 @@ public class UsuarioService {
 		return usuarioRepository.buscarPorId(id, empresaId);
 	}
 
+	public UsuarioDTO buscarUsuarioDtoPorId(Long id, Long empresaId) {
+		Optional<Usuario> usuarioRecuperado = buscarUsuarioPorId(id, empresaId);
+
+		if (!usuarioRecuperado.isPresent()) {
+			throw new MsgApiException("Usuário não foi encontrado.");
+		}
+
+		Usuario usuario = usuarioRecuperado.get();
+		UsuarioDTO dto = new UsuarioDTO();
+		dto.setId(usuario.getId());
+		dto.setLogin(usuario.getLogin());
+		dto.setLiberado(usuario.getLiberado());
+		dto.setPessoa(usuario.getClienteFuncionario().getPessoa().getNome());
+		dto.setClienteFuncionario(usuario.getClienteFuncionario().getId());
+		dto.setEmpresa(usuario.getEmpresa().getPessoa().getNome());
+		dto.setTipoClienteFuncionario(usuario.getClienteFuncionario().getTipoClienteFuncionario().name());
+
+		return dto;
+	}
+
 	public List<Usuario> buscarUsuariosPorIds(Iterable<Long> ids, Long empresaId) {
 		return usuarioRepository.buscarPorIds(ids, empresaId);
 	}

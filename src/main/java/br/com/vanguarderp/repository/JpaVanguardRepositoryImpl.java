@@ -109,11 +109,12 @@ public class JpaVanguardRepositoryImpl<T, ID extends Serializable>
 				+ (isMultiEmpresa ? " AND e.empresa.id = :empresaId" : "");
 		
 		TypedQuery<T> query = entityManager.createQuery(jpql, domainClass);
-		
+		query.setParameter("id", id);
+
 		if (isMultiEmpresa) {
 			query.setParameter("empresaId", empresaId);
 		}
-		
+
 		return query.getResultStream().findFirst();
 	}
 

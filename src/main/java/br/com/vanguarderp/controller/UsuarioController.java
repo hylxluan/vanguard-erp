@@ -36,4 +36,10 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioService.listarUsuarios(usuarioLogadoService.getIdEmpresaLogada()));
 	}
 
+
+	@GetMapping("/buscarPorId/{id}")
+	public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable(required = true) Long id) {
+		return ResponseEntity.ok(usuarioService.buscarUsuarioDtoPorId(id, usuarioLogadoService.getIdEmpresaLogada()));
+	}
+
 }
