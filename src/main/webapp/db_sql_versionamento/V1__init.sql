@@ -172,3 +172,125 @@ INSERT INTO public.role_usuario(
 	id, acesso_id, usuario_id)
 	VALUES (1, 2, 1);
 	select nextval('seq_role_usuario');
+
+
+/* ===== Bateria de dados de teste: funcionários da empresa 1 ===== */
+
+INSERT INTO public.pessoa(
+    id, ativo, bairro, cep, cidade, cnpj, complemento, cpf, data_cadastro, email, estado, inscricao_estadual, logradouro, nome, nome_fantasia, observacao, pais, razao_social, telefone, tipo_pessoa, empresa_id)
+    VALUES (
+        2,
+        true,
+        'Casa Forte',
+        '52061-030',
+        'Recife',
+        null,
+        'Casa 12',
+        '529.982.247-25',
+        '2024-03-10',
+        'maria.silva@ajsolucoes.com.br',
+        'PE',
+        null,
+        'Rua Dona Olegarinha, 120',
+        'Maria Clara da Silva',
+        null,
+        'Funcionária de teste - Financeiro',
+        'Brasil',
+        null,
+        '(81) 98888-1111',
+        'PF',
+        1
+    );
+SELECT nextval('seq_pessoa');
+
+INSERT INTO public.pessoa(
+    id, ativo, bairro, cep, cidade, cnpj, complemento, cpf, data_cadastro, email, estado, inscricao_estadual, logradouro, nome, nome_fantasia, observacao, pais, razao_social, telefone, tipo_pessoa, empresa_id)
+    VALUES (
+        3,
+        true,
+        'Madalena',
+        '50610-000',
+        'Recife',
+        null,
+        'Apto 304',
+        '168.995.350-09',
+        '2024-05-22',
+        'joao.santos@ajsolucoes.com.br',
+        'PE',
+        null,
+        'Rua Real da Torre, 450',
+        'Joao Pedro Santos',
+        null,
+        'Funcionário de teste - Vendas',
+        'Brasil',
+        null,
+        '(81) 97777-2222',
+        'PF',
+        1
+    );
+SELECT nextval('seq_pessoa');
+
+
+INSERT INTO public.cliente_funcionario(
+	id,
+	tipo_cliente_funcionario,
+	empresa_id,
+	pessoa_id,
+	usuario_id)
+	VALUES (2, 'FUNCIONARIO', 1, 2, null);
+
+select nextval('seq_cliente_funcionario');
+
+INSERT INTO public.cliente_funcionario(
+	id,
+	tipo_cliente_funcionario,
+	empresa_id,
+	pessoa_id,
+	usuario_id)
+	VALUES (3, 'FUNCIONARIO', 1, 3, null);
+
+select nextval('seq_cliente_funcionario');
+
+
+/*Senha de teste dos dois usuários: sport clube do recife */
+
+INSERT INTO public.usuario(
+	id,
+	liberado,
+	login,
+	refresh_token,
+	senha,
+	access_token,
+	cliente_funcionario_id,
+	empresa_id)
+	VALUES (2, true, 'maria.silva@ajsolucoes.com.br', '', '$argon2id$v=19$m=19456,t=2,p=1$h55mNr9p4WLZdKJPl+FWRw$Co3DLQBZNFuNWvmAZZqIivAg48mIpOYyId+Msxg5nZs', '', 2, 1);
+
+	select nextval('seq_usuario');
+
+INSERT INTO public.usuario(
+	id,
+	liberado,
+	login,
+	refresh_token,
+	senha,
+	access_token,
+	cliente_funcionario_id,
+	empresa_id)
+	VALUES (3, true, 'joao.santos@ajsolucoes.com.br', '', '$argon2id$v=19$m=19456,t=2,p=1$h55mNr9p4WLZdKJPl+FWRw$Co3DLQBZNFuNWvmAZZqIivAg48mIpOYyId+Msxg5nZs', '', 3, 1);
+
+	select nextval('seq_usuario');
+
+
+update cliente_funcionario SET usuario_id = 2 where id = 2;
+update cliente_funcionario SET usuario_id = 3 where id = 3;
+
+
+INSERT INTO public.role_usuario(
+	id, acesso_id, usuario_id)
+	VALUES (2, 1, 2);
+	select nextval('seq_role_usuario');
+
+INSERT INTO public.role_usuario(
+	id, acesso_id, usuario_id)
+	VALUES (3, 1, 3);
+	select nextval('seq_role_usuario');
