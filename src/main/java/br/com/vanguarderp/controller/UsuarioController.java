@@ -21,7 +21,16 @@ public class UsuarioController {
 	
 	@Autowired
 	private UsuarioLogadoService usuarioLogadoService;
-	
+
+	@PostMapping("/cadastrarUsuario")
+	public ResponseEntity<UsuarioDTO> cadastrarUsuario(@RequestBody @Valid UsuarioDTO usuarioDTO) {
+
+		UsuarioDTO usuarioSalvo = usuarioService.salvarUsuario(usuarioDTO);
+
+		return ResponseEntity.ok(usuarioDTO);
+	}
+
+
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
 		

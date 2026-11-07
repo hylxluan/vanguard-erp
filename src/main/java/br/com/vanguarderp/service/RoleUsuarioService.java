@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.vanguarderp.exceptions.MsgApiException;
 import br.com.vanguarderp.model.RoleUsuario;
 import br.com.vanguarderp.repository.RoleUsuarioRepository;
 import jakarta.persistence.EntityManager;
@@ -18,6 +19,30 @@ public class RoleUsuarioService {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Autowired
+	private UsuarioLogadoService usuarioLogadoService;
+
+	public RoleUsuario salvar(RoleUsuario roleUsuario) {
+
+		if (roleUsuario.getAcesso() == null) {
+			throw new MsgApiException("Acesso deve ser informado para associar ao usuário.");
+		}
+
+		if (roleUsuario.getUsuario() == null) {
+			throw new MsgApiException("Usuário deve ser informado para associar acesso.");
+		}
+
+		if (roleUsuarioRepository.existePorUsuarioERole(roleUsuario.getUsuario().getId(),
+				roleUsuario.getAcesso().getId(), usuarioLogadoService.getIdEmpresaLogada())) {
+
+			throw new MsgApiException("Já existe o acesso de: " + roleUsuario.getAcesso().getAcesso()
+					+ " associado para o mesmo usuário: "
+					+ roleUsuario.getUsuario().getClienteFuncionario().getPessoa().getNome());
+		}
+
+		return roleUsuarioRepository.saveAndFlush(roleUsuario);
+	}
 
 	public List<RoleUsuario> getFindAllByUsuario(Long idUsuario, Long idEmpresa) {
 		return roleUsuarioRepository.findAllByUsuario(idUsuario, idEmpresa);

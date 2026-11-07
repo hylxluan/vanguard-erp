@@ -7,6 +7,7 @@ import br.com.vanguarderp.dto.UsuarioDTO;
 import br.com.vanguarderp.exceptions.MsgApiException;
 import br.com.vanguarderp.model.ClienteFuncionario;
 import br.com.vanguarderp.model.Role;
+import br.com.vanguarderp.model.RoleUsuario;
 import br.com.vanguarderp.model.Usuario;
 import br.com.vanguarderp.repository.UsuarioRepository;
 import jakarta.persistence.EntityManager;
@@ -54,6 +55,9 @@ public class UsuarioService {
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
+
+	@Autowired
+	private RoleUsuarioService roleUsuarioService;
 	
 	public TokenDTO login(LoginDTO login) {
 		Usuario usuario = usuarioRepository.buscarPorLogin(login.getLogin());
@@ -84,43 +88,63 @@ public class UsuarioService {
 	}
 	
 	
-	public Usuario salvarUsuario(Usuario usuario) {
+	@Transactional
+	public UsuarioDTO salvarUsuario(UsuarioDTO usuarioDTO) {
 		
-		if (!usuario.isAdmin()) {
+		if (!usuarioLogadoService.isAdmin()) {
 			throw new MsgApiException("Apenas usuários administradores podem criar novos usuários!");
 		}
-		
-		if (usuarioRepository.existePorLogin(usuario.getLogin(), usuarioLogadoService.getIdEmpresaLogada())) {
+
+		if (usuarioRepository.existePorLogin(usuarioDTO.getLogin(), usuarioLogadoService.getIdEmpresaLogada())) {
 			throw new MsgApiException("Já existe um usuário com este login");
 		}
-		
-		if (usuario.getSenha().length() < 5) {
+
+
+		if (usuarioDTO.getSenha().length() < 5) {
 			throw new MsgApiException("A senha deve ter no mínimo 5 caracteres");
 		}
 		
-		if (usuarioRepository.existePorPessoa(usuario.getClienteFuncionario()
-													 .getPessoa().getId(), usuarioLogadoService.getIdEmpresaLogada())) {
+		if (usuarioRepository.existePorPessoa(usuarioDTO.getPessoaId(), usuarioLogadoService.getIdEmpresaLogada())) {
 			
 			throw new MsgApiException("Já existe um usuário vinculado a esta pessoa.");
 		}
 		
-		ClienteFuncionario clienteFuncionario = clienteFuncionarioService.findByPessoa(usuario.getClienteFuncionario()
-				.getPessoa().getId(), usuarioLogadoService.getIdEmpresaLogada());
-		
+		ClienteFuncionario clienteFuncionario = clienteFuncionarioService.findByPessoa(usuarioDTO.getPessoaId(), usuarioLogadoService.getIdEmpresaLogada());
+
+		if  (clienteFuncionario == null) {
+			throw new MsgApiException("Não foi informado o registro de pessoa/ cliente ou funcioário para o usuário.");
+		}
 		
 		List<Role> roles = roleService.buscarPorAcesso("ROLE_USER");
-		
-		usuario.setEmpresa(usuarioLogadoService.getEmpresaLogada());
+
+		Usuario usuario = new Usuario();
+
+		usuario.setLogin(usuarioDTO.getLogin());
+		usuario.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+		usuario.setLiberado(usuarioDTO.isLiberado());
 		usuario.setClienteFuncionario(clienteFuncionario);
-		usuario.setAcessos(roles);
-		
+		usuario.setEmpresa(usuarioLogadoService.getEmpresaLogada());
 		usuario = usuarioRepository.saveAndFlush(usuario);
-		
+
+		for (Role role : roles) {
+			RoleUsuario roleUsuario = new RoleUsuario();
+			roleUsuario.setUsuario(usuario);
+			roleUsuario.setAcesso(role);
+			roleUsuarioService.salvar(roleUsuario);
+		}
+
 		clienteFuncionario.setUsuario(usuario);
 		clienteFuncionarioService.salvar(clienteFuncionario);
+
+		usuarioDTO.setPessoa(clienteFuncionario.getPessoa().getNome());
+		usuarioDTO.setEmpresa(usuario.getEmpresa().getPessoa().getNome());
+		usuarioDTO.setClienteFuncionario(clienteFuncionario.getId());
+		usuarioDTO.setTipoClienteFuncionario(usuario.getClienteFuncionario().getTipoClienteFuncionario().name());
+		usuarioDTO.setId(usuario.getId());
+		usuarioDTO.setSenha("*****");
+
 		
-		
-		return usuario;
+		return usuarioDTO;
 	}
 	
 	public Usuario atualizarUsuario(Usuario usuario) {

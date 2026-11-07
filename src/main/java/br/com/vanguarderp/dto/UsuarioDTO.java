@@ -1,8 +1,11 @@
 package br.com.vanguarderp.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class UsuarioDTO {
+
     private Long id;
     private String pessoa;
     private String empresa;
@@ -17,7 +20,11 @@ public class UsuarioDTO {
 
     private Long clienteFuncionario;
 
+    @NotNull(message = "Pessoa deve ser informada para cadastrar o usuário de acesso ao sistema.")
     private Long pessoaId;
+
+
+
 
     public Long getClienteFuncionario() {
         return clienteFuncionario;
@@ -94,6 +101,8 @@ public class UsuarioDTO {
 
     public UsuarioDTO() {
     }
+
+    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
     public UsuarioDTO(String login, Long id, String pessoa, String empresa, String tipoClienteFuncionario, boolean liberado, String senha, Long clienteFuncionario, Long pessoaId) {
         this.login = login;
         this.id = id;

@@ -15,7 +15,7 @@ import java.util.List;
 public interface UsuarioRepository extends JpaVanguardRepository<Usuario, Long> {
 
 	@IgnoreEmpresaId(ignore = true, motivo = "Busca de usuário pelo login para então associar à sua empresa")
-	@EntityGraph(attributePaths = {"empresa", "acessos"})
+	@EntityGraph(attributePaths = {"empresa", "empresa.pessoa", "acessos"})
 	@Query("select u from Usuario u where u.login = :login")
 	Usuario buscarPorLogin(@Param("login") String login);
 	
@@ -61,7 +61,8 @@ public interface UsuarioRepository extends JpaVanguardRepository<Usuario, Long> 
 	@Modifying(flushAutomatically = true, clearAutomatically = true)
 	@Query("delete from Usuario u where u.empresa.id = :idEmpresa and u.id = :id")
 	void deleteById(@Param("id") Long id, @Param("idEmpresa") Long idEmpresa);
-	
+
+
 	
 	@Transactional
 	@Modifying(flushAutomatically = true, clearAutomatically = true)
