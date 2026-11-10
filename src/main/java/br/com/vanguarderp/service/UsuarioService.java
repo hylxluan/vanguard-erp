@@ -147,42 +147,47 @@ public class UsuarioService {
 		return usuarioDTO;
 	}
 	
-	public Usuario atualizarUsuario(Usuario usuario) {
+	public UsuarioDTO atualizarUsuario(UsuarioDTO usuarioDto) {
 		
-		if (!usuario.isAdmin()) {
+		if (!usuarioLogadoService.isAdmin()) {
 			throw new MsgApiException("Apenas usuários administradores podem atualizar usuários!");
 		}
 		
-		if (usuarioRepository.existeOutroUsuarioComPessoa(usuario.getClienteFuncionario()
-				.getPessoa().getId(), usuario.getId(), usuarioLogadoService.getIdEmpresaLogada())) {
+		if (usuarioRepository.existeOutroUsuarioComPessoa(usuarioDto.getPessoaId(), usuarioDto.getId(), usuarioLogadoService.getIdEmpresaLogada())) {
 			throw new MsgApiException("Já existe outro usuário vinculado a esta pessoa.");
 		}
-		
-		Usuario usuarioExistente = usuarioRepository.buscarPorId(usuario.getId(), usuarioLogadoService.getIdEmpresaLogada()).get();
-		
-		if (usuarioExistente == null) {
-			throw new MsgApiException("Usuário não encontrado para atualização.");
-		}
-		
-		if (usuarioExistente.getAcessos() == null || usuarioExistente.getAcessos().isEmpty()) {
-			usuario.setAcessos(usuarioExistente.getAcessos());
-		}
-		
-		ClienteFuncionario clienteFuncionario = clienteFuncionarioService.findByPessoa(usuario.getClienteFuncionario()
-				.getPessoa().getId(), usuarioLogadoService.getIdEmpresaLogada());
+
+		ClienteFuncionario clienteFuncionario = clienteFuncionarioService.findByPessoa(usuarioDto.getPessoaId(), usuarioLogadoService.getIdEmpresaLogada());
 		
 		if (clienteFuncionario == null) {
 			throw new MsgApiException("Pessoa não encontrada para atualizar o usuário.");
 		}
-		
+
+		Usuario usuarioExistente = usuarioRepository.buscarPorId(usuarioDto.getId(), usuarioLogadoService.getIdEmpresaLogada()).get();
+
+		if (usuarioExistente == null) {
+			throw new MsgApiException("Usuário não encontrado para atualização.");
+		}
+
+		usuarioExistente.setLogin(usuarioDto.getLogin());
+		usuarioExistente.setLiberado(usuarioDto.isLiberado());
+		usuarioExistente.setClienteFuncionario(clienteFuncionario);
+		usuarioExistente.setEmpresa(usuarioLogadoService.getEmpresaLogada());
+		usuarioExistente = usuarioRepository.saveAndFlush(usuarioExistente);
 		
 		usuarioExistente.setEmpresa(usuarioLogadoService.getEmpresaLogada());
 		usuarioExistente.setClienteFuncionario(clienteFuncionario);
-		usuario.setSenha(usuarioExistente.getSenha());
+
+
+		usuarioDto.setPessoa(clienteFuncionario.getPessoa().getNome());
+		usuarioDto.setEmpresa(usuarioExistente.getEmpresa().getPessoa().getNome());
+		usuarioDto.setClienteFuncionario(clienteFuncionario.getId());
+		usuarioDto.setTipoClienteFuncionario(usuarioExistente.getClienteFuncionario().getTipoClienteFuncionario().name());
+		usuarioDto.setId(usuarioExistente.getId());
+		usuarioDto.setSenha("*****");
 		
 		
-		
-		return usuarioRepository.saveAndFlush(usuarioExistente);
+		return usuarioDto;
 		
 	}
 	

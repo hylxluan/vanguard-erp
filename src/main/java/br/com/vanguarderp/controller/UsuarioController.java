@@ -27,7 +27,15 @@ public class UsuarioController {
 
 		UsuarioDTO usuarioSalvo = usuarioService.salvarUsuario(usuarioDTO);
 
-		return ResponseEntity.ok(usuarioDTO);
+		return ResponseEntity.ok(usuarioSalvo);
+	}
+
+	@PostMapping("/atualizarUsuario")
+	public ResponseEntity<UsuarioDTO> atualizarUsuario(@RequestBody @Valid UsuarioDTO usuarioDTO) {
+
+		UsuarioDTO usuarioSalvo = usuarioService.atualizarUsuario(usuarioDTO);
+
+		return ResponseEntity.ok(usuarioSalvo);
 	}
 
 
