@@ -1,5 +1,6 @@
 package br.com.vanguarderp.controller;
 
+import br.com.vanguarderp.dto.AlterarSenhaDTO;
 import br.com.vanguarderp.dto.LoginDTO;
 import br.com.vanguarderp.dto.TokenDTO;
 import br.com.vanguarderp.dto.UsuarioDTO;
@@ -38,13 +39,18 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioSalvo);
 	}
 
-
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
 		
 		TokenDTO token = usuarioService.login(loginDTO);
 		
 		return ResponseEntity.ok(token);
+	}
+
+	@PostMapping("/alterarSenha")
+	public ResponseEntity<String> alterarSenha(@RequestBody @Valid AlterarSenhaDTO  alterarSenhaDTO) {
+		usuarioService.alterarSenhaUsuario(alterarSenhaDTO);
+		return  ResponseEntity.ok("Senha alterada!");
 	}
 
 

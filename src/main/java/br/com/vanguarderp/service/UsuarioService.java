@@ -192,27 +192,32 @@ public class UsuarioService {
 	}
 	
 	public void alterarSenhaUsuario(AlterarSenhaDTO dto) {
-		Usuario usuarioRecuperado = usuarioRepository.buscarPorId(dto.getIdUsuario(), usuarioLogadoService.getIdEmpresaLogada()).get();
-		
-		if (usuarioRecuperado == null) {
-			throw new MsgApiException("Usuário não encontrado para alteração de senha.");
+
+		if (!usuarioLogadoService.isAdmin() && !usuarioLogadoService.getIdUsuarioLogado().equals(dto.getIdUsuario())) {
+			throw new MsgApiException("Você só pode alterar sua própria senha!", HttpStatus.FORBIDDEN);
+		}
+
+		if (!dto.getNovaSenha().equals(dto.getConfirmarNovaSenha())) {
+			throw new MsgApiException("A nova senha e a confirmação da nova senha não coincidem!");
+		}
+
+		Usuario usuarioRecuperado = usuarioRepository.buscarPorId(dto.getIdUsuario(), usuarioLogadoService.getIdEmpresaLogada())
+				.orElseThrow(() -> new MsgApiException("Usuário não encontrado para alteração de senha."));
+
+		if (!usuarioRecuperado.isEnabled()) {
+			throw new MsgApiException("Usuário bloqueado, entre em contato com o administrador do sistema.", HttpStatus.FORBIDDEN);
 		}
 		
 		if (usuarioRecuperado.getEmpresa().getBloqueio()) {
 			throw new MsgApiException("A empresa está bloqueada. Não é possível alterar a senha do usuário, entre em contato com o administrador do sistema!");
 		}
-		
-		
-		
+
 		if (!passwordEncoder.matches(dto.getSenhaAtual(), usuarioRecuperado.getSenha())) {
 			throw new MsgApiException("Senha atual inválida.");
 		}
-		
-		if (!dto.getNovaSenha().equals(dto.getConfirmarNovaSenha())) {
-			throw new MsgApiException("A nova senha e a confirmação da nova senha não coincidem!");
-		}
-		
-		if (passwordEncoder.matches(dto.getNovaSenha(), usuarioRecuperado.getSenha())) {
+
+		// senhaAtual já foi validada contra o hash, então basta comparar as strings
+		if (dto.getNovaSenha().equals(dto.getSenhaAtual())) {
 			throw new MsgApiException("A senha nova não pode ser igual à senha atual.");
 		}
 		

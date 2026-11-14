@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public class AlterarSenhaDTO {
 
-	@NotNull(message = "Senha atual deve ser informada!")
+	@NotNull(message = "Id do usuário deve ser informado!")
 	private Long idUsuario;
 	
 	@NotBlank(message = "Senha atual deve ser informada!")
