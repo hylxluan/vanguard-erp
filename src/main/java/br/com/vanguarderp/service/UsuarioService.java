@@ -15,7 +15,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -216,7 +219,6 @@ public class UsuarioService {
 			throw new MsgApiException("Senha atual inválida.");
 		}
 
-		// senhaAtual já foi validada contra o hash, então basta comparar as strings
 		if (dto.getNovaSenha().equals(dto.getSenhaAtual())) {
 			throw new MsgApiException("A senha nova não pode ser igual à senha atual.");
 		}
@@ -271,6 +273,45 @@ public class UsuarioService {
 
 	public Page<Usuario> listarUsuariosPaginado(Long empresaId, Pageable pageable) {
 		return usuarioRepository.listarPaginado(empresaId, pageable);
+	}
+
+	public List<UsuarioDTO> listarUsuariosPaginadoDto(Long empresaId, Pageable pageable) {
+		return converterListaUsuariosDTO(usuarioRepository.listarPaginado(empresaId, pageable).getContent());
+	}
+
+	/* O campo de ordenação vai concatenado no JPQL, então só aceita campos da whitelist */
+	private static final Map<String, String> CAMPOS_ORDENACAO_USUARIO = Map.of(
+			"id", "id",
+			"login", "login",
+			"liberado", "liberado",
+			"pessoa", "clienteFuncionario.pessoa.nome");
+
+	private static final int TAMANHO_MAXIMO_PAGINA = 100;
+
+	public List<UsuarioDTO> listarUsuariosPaginadoDto(Long empresaId, int page, int size, String sort, String direction) {
+		if (page < 0) {
+			throw new MsgApiException("A página deve ser maior ou igual a 0.");
+		}
+
+		if (size < 1 || size > TAMANHO_MAXIMO_PAGINA) {
+			throw new MsgApiException("O tamanho da página deve estar entre 1 e " + TAMANHO_MAXIMO_PAGINA + ".");
+		}
+
+		String campoOrdenacao = CAMPOS_ORDENACAO_USUARIO.get(sort);
+		if (campoOrdenacao == null) {
+			throw new MsgApiException("Campo de ordenação inválido: " + sort + ". Use: id, login, liberado ou pessoa.");
+		}
+
+		Sort.Direction sortDirection;
+		if ("asc".equalsIgnoreCase(direction)) {
+			sortDirection = Sort.Direction.ASC;
+		} else if ("desc".equalsIgnoreCase(direction)) {
+			sortDirection = Sort.Direction.DESC;
+		} else {
+			throw new MsgApiException("Direção de ordenação inválida: " + direction + ". Use asc ou desc.");
+		}
+
+		return listarUsuariosPaginadoDto(empresaId, PageRequest.of(page, size, Sort.by(sortDirection, campoOrdenacao)));
 	}
 
 	public long totalUsuarios(Long empresaId) {
@@ -338,5 +379,24 @@ public class UsuarioService {
 	public long deletarTodosUsuarios(Long empresaId) {
 		return usuarioRepository.deletarAll(empresaId);
 	}
+
+	private UsuarioDTO converterUsuarioDTO(Usuario usuario) {
+		UsuarioDTO dto = new UsuarioDTO();
+		dto.setId(usuario.getId());
+		dto.setLogin(usuario.getLogin());
+		dto.setLiberado(usuario.getLiberado());
+		dto.setPessoa(usuario.getClienteFuncionario().getPessoa().getNome());
+		dto.setPessoaId(usuario.getClienteFuncionario().getPessoa().getId());
+		dto.setSenha("*****");
+		dto.setClienteFuncionario(usuario.getClienteFuncionario().getId());
+		dto.setEmpresa(usuario.getEmpresa().getPessoa().getNome());
+		dto.setTipoClienteFuncionario(usuario.getClienteFuncionario().getTipoClienteFuncionario().name());
+		return dto;
+	}
+
+	private List<UsuarioDTO> converterListaUsuariosDTO(List<Usuario> usuarios) {
+		return usuarios.stream().map(this::converterUsuarioDTO).toList();
+	}
+
 
 }

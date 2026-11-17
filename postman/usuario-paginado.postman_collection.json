@@ -1,0 +1,257 @@
+{
+  "info": {
+    "name": "VanguardERP - Usuario Paginado",
+    "description": "Testes do GET /api/usuario/paginado. Rode primeiro o 'Login' (salva o token na variável {{token}}), depois as demais requisições. Usuários de teste do V1__init.sql, senha: sport clube do recife.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/vanguard-erp" },
+    { "key": "login", "value": "maria.silva@ajsolucoes.com.br" },
+    { "key": "senha", "value": "sport clube do recife" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('token', pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"{{senha}}\"\n}"
+        },
+        "url": "{{baseUrl}}/api/usuario/login"
+      }
+    },
+    {
+      "name": "Sucesso",
+      "item": [
+        {
+          "name": "Sem params (defaults page=0 size=10 sort=id direction=desc)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('no máximo 10 itens', () => pm.expect(body.length).to.be.at.most(10));",
+                  "pm.test('ids em ordem desc', () => {",
+                  "  for (let i = 1; i < body.length; i++) pm.expect(body[i-1].id).to.be.above(body[i].id);",
+                  "});",
+                  "pm.test('senha mascarada', () => body.forEach(u => pm.expect(u.senha).to.eql('*****')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/usuario/paginado"
+          }
+        },
+        {
+          "name": "page=0 size=1 sort=id asc (primeiro usuário)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('1 item', () => pm.expect(body.length).to.eql(1));",
+                  "pm.test('campos do DTO', () => pm.expect(body[0]).to.include.keys('id','login','pessoa','pessoaId','empresa','clienteFuncionario','tipoClienteFuncionario','liberado','senha'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuario/paginado?page=0&size=1&sort=id&direction=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuario", "paginado"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "1" },
+                { "key": "sort", "value": "id" },
+                { "key": "direction", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "page=1 size=1 sort=id asc (segundo usuário)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('1 item', () => pm.expect(pm.response.json().length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuario/paginado?page=1&size=1&sort=id&direction=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuario", "paginado"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "size", "value": "1" },
+                { "key": "sort", "value": "id" },
+                { "key": "direction", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "sort=login asc",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuario/paginado?page=0&size=10&sort=login&direction=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuario", "paginado"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "login" },
+                { "key": "direction", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "sort=pessoa desc (nome da pessoa)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuario/paginado?page=0&size=10&sort=pessoa&direction=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuario", "paginado"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "pessoa" },
+                { "key": "direction", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "page=999 (além do total -> lista vazia)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('lista vazia', () => pm.expect(pm.response.json()).to.eql([]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/usuario/paginado?page=999&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuario", "paginado"],
+              "query": [
+                { "key": "page", "value": "999" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Erros (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400', () => pm.response.to.have.status(400));",
+              "pm.test('tem mensagem', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "page=-1",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?page=-1" }
+        },
+        {
+          "name": "size=0",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?size=0" }
+        },
+        {
+          "name": "size=101 (acima do máximo)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?size=101" }
+        },
+        {
+          "name": "sort=senha (fora da whitelist)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?sort=senha" }
+        },
+        {
+          "name": "direction=cima",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?direction=cima" }
+        },
+        {
+          "name": "page=abc (tipo inválido)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/usuario/paginado?page=abc" }
+        }
+      ]
+    }
+  ]
+}

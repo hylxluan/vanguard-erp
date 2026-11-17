@@ -18,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.ArrayList;
@@ -122,6 +123,20 @@ public class GlobalExceptionsHandler {
                 ExceptionUtil.getMensagemParametros(ex),
                 request.getRequestURI());
 
+
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseApi);
+    }
+
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ResponseApi> argumentTypeMismatchExceptions(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+
+        logException(ex, request);
+        ResponseApi responseApi = new ResponseApi(new Date(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Parâmetro com tipo inválido.",
+                "Valor '" + ex.getValue() + "' inválido para o parâmetro '" + ex.getName() + "'.",
+                request.getRequestURI());
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseApi);
     }

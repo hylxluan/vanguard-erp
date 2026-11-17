@@ -59,6 +59,15 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioService.listarUsuarios(usuarioLogadoService.getIdEmpresaLogada()));
 	}
 
+	@GetMapping("/paginado")
+	public ResponseEntity<List<UsuarioDTO>> listarPaginado(@RequestParam(defaultValue = "0") int page,
+														   @RequestParam(defaultValue = "10") int size,
+														   @RequestParam(defaultValue = "id") String sort,
+														   @RequestParam(defaultValue = "desc") String direction) {
+		List<UsuarioDTO> listaPaginada = usuarioService.listarUsuariosPaginadoDto(
+				usuarioLogadoService.getIdEmpresaLogada(), page, size, sort, direction);
+		return ResponseEntity.ok(listaPaginada);
+	}
 
 	@GetMapping("/buscarPorId/{id}")
 	public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable(required = true) Long id) {
