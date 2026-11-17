@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -114,7 +115,7 @@ public class JwtService {
 	        return true;
 	        
 	    } catch (Exception e) {
-	        throw new MsgApiException("Token inválido ou expirado");
+	        throw new MsgApiException("Token inválido ou expirado", HttpStatus.UNAUTHORIZED);
 	    }
 	}
 	

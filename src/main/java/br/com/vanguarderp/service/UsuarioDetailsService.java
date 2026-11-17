@@ -16,6 +16,9 @@ public class UsuarioDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+
+	@Autowired
+	private JwtService jwtService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -34,6 +37,17 @@ public class UsuarioDetailsService implements UserDetailsService {
 		}
 		
 		return usuarioRecuperado;
+	}
+
+	/* Só o último token gerado no login fica salvo em access_token; qualquer token anterior é rejeitado */
+	public void validarTokenAtual(String token) {
+		Long idUsuario = jwtService.extrairUsuarioId(token);
+		Long idEmpresa = jwtService.extrairEmpresaId(token);
+
+		if (!usuarioRepository.existsByTokenParaUsuario(idUsuario, token, idEmpresa)) {
+			throw new MsgApiException("Token não é mais válido. Foi feito um novo login com este usuário.", HttpStatus.UNAUTHORIZED);
+		}
+
 	}
 	
 }

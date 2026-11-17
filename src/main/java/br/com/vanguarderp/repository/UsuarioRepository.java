@@ -69,5 +69,15 @@ public interface UsuarioRepository extends JpaVanguardRepository<Usuario, Long> 
 	@Query("update Usuario set accessToken = :token where id = :id and empresa.id = :idEmpresa")
 	void updateAccessTokenLogin(@Param("id") Long id, @Param("token") String token, @Param("idEmpresa") Long idEmpresa);
 
-	
+	@Query(value = """
+			SELECT CASE
+   	           WHEN COUNT(*) > 0 THEN TRUE
+   	           ELSE FALSE
+   	       END
+   			FROM usuario u
+   			WHERE u.access_token = :token
+   			  AND u.empresa_id = :idEmpresa
+   			  AND u.id = :id;						
+					""", nativeQuery = true)
+	boolean existsByTokenParaUsuario(@Param("id") Long id, @Param("token") String token, @Param("idEmpresa") Long idEmpresa);
 }

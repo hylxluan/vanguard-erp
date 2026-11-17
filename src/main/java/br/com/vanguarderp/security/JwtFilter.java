@@ -1,8 +1,20 @@
 package br.com.vanguarderp.security;
 
-import java.io.IOException;
-
+import br.com.vanguarderp.exceptions.MsgApiException;
+import br.com.vanguarderp.exceptions.ResponseApi;
+import br.com.vanguarderp.model.Usuario;
+import br.com.vanguarderp.service.JwtService;
+import br.com.vanguarderp.service.UsuarioDetailsService;
+import br.com.vanguarderp.util.ObjectMapperUtil;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,79 +22,92 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import br.com.vanguarderp.exceptions.MsgApiException;
-import br.com.vanguarderp.model.Usuario;
-import br.com.vanguarderp.service.JwtService;
-import br.com.vanguarderp.service.UsuarioDetailsService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Date;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(JwtFilter.class);
+
 	@Autowired
 	private JwtService jwtService;
-	
+
 	@Autowired
 	private UsuarioDetailsService usuarioDetailsService;
-	
-	
-	
+
+	@Autowired
+	private ObjectMapperUtil objectMapperUtil;
+
+
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
+		String header = request.getHeader("Authorization");
+
+		if (header == null || !header.startsWith("Bearer ") || header.substring(7).isBlank()) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		String token = header.substring(7);
+
+		/* Só a validação do token fica no try: erro vindo do controller não pode virar 401 aqui */
 		try {
-			String header = request.getHeader("Authorization");
-			
-			if (header == null || !header.startsWith("Bearer ")) {
-				filterChain.doFilter(request, response);
-				return;
-			}
-			
-			String token = header.substring(7);
-			
-			if (token.isBlank()) {
-				filterChain.doFilter(request, response);
-				return;
-			}
-			
-			if (!jwtService.isTokenValido(token)) {
-				filterChain.doFilter(request, response);
-				return;
-			}
-			
-			
+			jwtService.isTokenValido(token);
+
 			String login = jwtService.extrairLogin(token);
-			
-			if (login != null || SecurityContextHolder.getContext().getAuthentication() == null) {
-				
+
+			if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+				usuarioDetailsService.validarTokenAtual(token);
+
 				UserDetails userDetails = usuarioDetailsService.loadUserByUsername(login);
-				
+
 				UsuarioAutenticado principal = new UsuarioAutenticado((Usuario) userDetails);
-				
+
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-																											 principal, 
-																											 token, 
+																											 principal,
+																											 token,
 																											 principal.getAuthorities()
 																											);
-				
+
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 
 			}
-			
-			
-			
+
+		} catch (MsgApiException e) {
+			LOGGER.warn("JWT rejeitado em {}: {}", request.getRequestURI(), e.getMessage());
+			escreverErro(request, response, e.getStatus(), e.getMessage());
+			return;
+
 		} catch (Exception e) {
-			e.printStackTrace();
-			SecurityContextHolder.clearContext();
-			throw new MsgApiException("Erro ao validar JWT do Usuário no Sistema.");
+			LOGGER.warn("Erro ao validar JWT em {}: {}", request.getRequestURI(), e.toString());
+			escreverErro(request, response, HttpStatus.UNAUTHORIZED, "Erro ao validar JWT do Usuário no Sistema.");
+			return;
 		}
-		
+
 		filterChain.doFilter(request, response);
 	}
-	
+
+	/* Exceção lançada em filtro não passa pelo @RestControllerAdvice, então a resposta é escrita aqui mesmo */
+	private void escreverErro(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String mensagem) throws IOException {
+		SecurityContextHolder.clearContext();
+
+		response.setStatus(status.value());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		response.setCharacterEncoding("UTF-8");
+
+		ResponseApi responseApi = new ResponseApi(new Date(),
+				status.value(),
+				status.getReasonPhrase(),
+				mensagem,
+				request.getRequestURI());
+
+		response.getWriter().write(objectMapperUtil.objetoParaJson(responseApi));
+	}
+
 }
