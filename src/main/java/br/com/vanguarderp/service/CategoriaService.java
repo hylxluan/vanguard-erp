@@ -1,27 +1,67 @@
 package br.com.vanguarderp.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
+import br.com.vanguarderp.dto.CategoriaDTO;
+import br.com.vanguarderp.exceptions.MsgApiException;
 import br.com.vanguarderp.model.Categoria;
 import br.com.vanguarderp.repository.CategoriaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 public class CategoriaService {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
+
+	@Autowired
+	private UsuarioLogadoService usuarioLogadoService;
+
 	@PersistenceContext
 	private EntityManager entityManager;
-	
+
+	@Transactional
+	public CategoriaDTO salvarCategoria(CategoriaDTO categoriaDTO) {
+
+		if (categoriaRepository.existePorNome(categoriaDTO.getNome(), usuarioLogadoService.getIdEmpresaLogada())) {
+			throw new MsgApiException("Já existe uma categoria com o mesmo nome para a empresa logada.");
+		}
+
+		Categoria categoria = new Categoria();
+		categoria.setNome(categoriaDTO.getNome());
+		categoria.setEmpresa(usuarioLogadoService.getEmpresaLogada());
+
+
+		return converterParaDto(categoriaRepository.saveAndFlush(categoria));
+	}
+
+	@Transactional
+	public CategoriaDTO atualizarCategoria(CategoriaDTO categoriaDTO) {
+
+		if (categoriaDTO.getId() == null) {
+			throw new MsgApiException("Não foi informado uma categoria com o mesmo id.");
+		}
+
+		if (categoriaRepository.existePorNomeDiferenteId(categoriaDTO.getId(), categoriaDTO.getNome(), usuarioLogadoService.getIdEmpresaLogada())) {
+			throw new MsgApiException("Já existe uma categoria com este mesmo nome, informe outro nome.");
+		}
+
+		Categoria categoriaExistente = categoriaRepository.buscarPorId(categoriaDTO.getId(), usuarioLogadoService.getIdEmpresaLogada())
+														  .orElseThrow(() -> new MsgApiException("Categoria não encontrada pra esta empresa"));
+
+		categoriaExistente.setNome(categoriaDTO.getNome());
+
+		return converterParaDto(categoriaRepository.saveAndFlush(categoriaExistente));
+	}
+
 
 	public List<Categoria> getAllCategorias() {
 		return categoriaRepository.findAll();
@@ -74,5 +114,18 @@ public class CategoriaService {
 	public long deletarTodasCategorias(Long empresaId) {
 		return categoriaRepository.deletarAll(empresaId);
 	}
-	
+
+	private CategoriaDTO converterParaDto(Categoria categoria) {
+		CategoriaDTO dto = new CategoriaDTO();
+		dto.setId(categoria.getId());
+		dto.setNome(categoria.getNome());
+		dto.setEmpresaId(categoria.getEmpresa().getId());
+		return dto;
+	}
+
+	private List<CategoriaDTO> converterListaParaDto(List<Categoria> categorias) {
+		return categorias.stream().map(this::converterParaDto).toList();
+	}
+
+
 }
