@@ -23,7 +23,7 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioLogadoService usuarioLogadoService;
 
-	@PostMapping("/cadastrarUsuario")
+	@PostMapping("/cadastrar")
 	public ResponseEntity<UsuarioDTO> cadastrarUsuario(@RequestBody @Valid UsuarioDTO usuarioDTO) {
 
 		UsuarioDTO usuarioSalvo = usuarioService.salvarUsuario(usuarioDTO);
@@ -31,7 +31,7 @@ public class UsuarioController {
 		return ResponseEntity.ok(usuarioSalvo);
 	}
 
-	@PostMapping("/atualizarUsuario")
+	@PostMapping("/atualizar")
 	public ResponseEntity<UsuarioDTO> atualizarUsuario(@RequestBody @Valid UsuarioDTO usuarioDTO) {
 
 		UsuarioDTO usuarioSalvo = usuarioService.atualizarUsuario(usuarioDTO);
