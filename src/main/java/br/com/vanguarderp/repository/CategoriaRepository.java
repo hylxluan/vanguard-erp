@@ -45,7 +45,4 @@ public interface CategoriaRepository extends JpaVanguardRepository<Categoria, Lo
 		   " c.id = :id")
 	void deleteByIdAndEmpresa(@Param("id") Long id, @Param("idEmpresa") Long idEmpresa);
 
-	
-	
-	
 }
