@@ -1,0 +1,859 @@
+{
+  "info": {
+    "name": "VanguardERP - Categoria",
+    "description": "Testes dos endpoints de /api/categoria. Rode a collection inteira em ordem: o 'Auth / Login' salva o token em {{token}} e o 'Fluxo CRUD' cria, consulta, atualiza e apaga as próprias categorias (nomes únicos por execução), então pode ser rodada várias vezes sem sujar o banco. Usuários de teste do V1__init.sql, senha: sport clube do recife.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/vanguard-erp"
+    },
+    {
+      "key": "login",
+      "value": "maria.silva@ajsolucoes.com.br"
+    },
+    {
+      "key": "senha",
+      "value": "sport clube do recife"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "nomeCategoria",
+      "value": ""
+    },
+    {
+      "key": "nomeCategoria2",
+      "value": ""
+    },
+    {
+      "key": "categoriaId",
+      "value": ""
+    },
+    {
+      "key": "categoriaId2",
+      "value": ""
+    },
+    {
+      "key": "empresaId",
+      "value": ""
+    },
+    {
+      "key": "qtdListar",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{login}}\",\n  \"senha\": \"{{senha}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/usuario/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fluxo CRUD",
+      "item": [
+        {
+          "name": "Cadastrar",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const sufixo = Date.now();",
+                  "pm.collectionVariables.set('nomeCategoria', 'Postman Categoria ' + sufixo);",
+                  "pm.collectionVariables.set('nomeCategoria2', 'Postman Outra ' + sufixo);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('retorna id, nome e empresaId', () => {",
+                  "  pm.expect(body.id).to.be.a('number');",
+                  "  pm.expect(body.nome).to.eql(pm.collectionVariables.get('nomeCategoria'));",
+                  "  pm.expect(body.empresaId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('categoriaId', body.id);",
+                  "pm.collectionVariables.set('empresaId', body.empresaId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{nomeCategoria}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Cadastrar segunda categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('categoriaId2', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{nomeCategoria2}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Cadastrar nome duplicado (maiúsculo) -> 400",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set('nomeMaiusculo', pm.collectionVariables.get('nomeCategoria').toUpperCase());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensagem de duplicado', () => pm.expect(pm.response.json().message).to.include('mesmo nome'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{nomeMaiusculo}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Buscar por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('é a categoria cadastrada', () => {",
+                  "  pm.expect(body.id).to.eql(Number(pm.collectionVariables.get('categoriaId')));",
+                  "  pm.expect(body.nome).to.eql(pm.collectionVariables.get('nomeCategoria'));",
+                  "  pm.expect(body.empresaId).to.eql(Number(pm.collectionVariables.get('empresaId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorId/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Buscar por nome (trecho, minúsculo)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const nome = pm.collectionVariables.get('nomeCategoria');",
+                  "pm.variables.set('trechoNome', nome.substring(9).toLowerCase());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const id = Number(pm.collectionVariables.get('categoriaId'));",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('encontra a categoria', () => pm.expect(body.map(c => c.id)).to.include(id));",
+                  "pm.test('não traz a segunda categoria', () => pm.expect(body.map(c => c.id)).to.not.include(Number(pm.collectionVariables.get('categoriaId2'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/categoria/buscarPorNome?nome={{trechoNome}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categoria",
+                "buscarPorNome"
+              ],
+              "query": [
+                {
+                  "key": "nome",
+                  "value": "{{trechoNome}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const ids = body.map(c => c.id);",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('contém as duas categorias', () => {",
+                  "  pm.expect(ids).to.include(Number(pm.collectionVariables.get('categoriaId')));",
+                  "  pm.expect(ids).to.include(Number(pm.collectionVariables.get('categoriaId2')));",
+                  "});",
+                  "pm.test('só categorias da empresa logada', () => body.forEach(c => pm.expect(c.empresaId).to.eql(Number(pm.collectionVariables.get('empresaId')))));",
+                  "pm.collectionVariables.set('qtdListar', body.length);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/listar"
+          }
+        },
+        {
+          "name": "Total",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('total igual ao tamanho do /listar', () => pm.expect(pm.response.json()).to.eql(Number(pm.collectionVariables.get('qtdListar'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/total"
+          }
+        },
+        {
+          "name": "Paginado (defaults page=0 size=10 sort=id direction=desc)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('no máximo 10 itens', () => pm.expect(body.length).to.be.at.most(10));",
+                  "pm.test('ids em ordem desc', () => {",
+                  "  for (let i = 1; i < body.length; i++) pm.expect(body[i-1].id).to.be.above(body[i].id);",
+                  "});",
+                  "pm.test('a mais recente vem primeiro', () => pm.expect(body[0].id).to.eql(Number(pm.collectionVariables.get('categoriaId2'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado"
+          }
+        },
+        {
+          "name": "Paginado page=0 size=2 sort=nome asc",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('no máximo 2 itens', () => pm.expect(body.length).to.be.at.most(2));",
+                  "pm.test('nomes em ordem asc', () => {",
+                  "  for (let i = 1; i < body.length; i++) pm.expect(body[i-1].nome.localeCompare(body[i].nome, 'pt-BR')).to.be.at.most(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/categoria/paginado?page=0&size=2&sort=nome&direction=asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categoria",
+                "paginado"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "2"
+                },
+                {
+                  "key": "sort",
+                  "value": "nome"
+                },
+                {
+                  "key": "direction",
+                  "value": "asc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Paginado page=999 (lista vazia)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('lista vazia', () => pm.expect(pm.response.json()).to.eql([]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?page=999&size=10"
+          }
+        },
+        {
+          "name": "Atualizar",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('nomeCategoria', pm.collectionVariables.get('nomeCategoria') + ' Editada');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('mesmo id, nome novo', () => {",
+                  "  pm.expect(body.id).to.eql(Number(pm.collectionVariables.get('categoriaId')));",
+                  "  pm.expect(body.nome).to.eql(pm.collectionVariables.get('nomeCategoria'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{categoriaId}},\n  \"nome\": \"{{nomeCategoria}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/atualizar"
+          }
+        },
+        {
+          "name": "Buscar por ID após atualizar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('nome persistido', () => pm.expect(pm.response.json().nome).to.eql(pm.collectionVariables.get('nomeCategoria')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorId/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Atualizar com o mesmo nome (sem mudança) -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 (não conflita consigo mesma)', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{categoriaId}},\n  \"nome\": \"{{nomeCategoria}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/atualizar"
+          }
+        },
+        {
+          "name": "Atualizar para nome de outra categoria -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensagem de duplicado', () => pm.expect(pm.response.json().message).to.include('mesmo nome'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{categoriaId}},\n  \"nome\": \"{{nomeCategoria2}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/atualizar"
+          }
+        },
+        {
+          "name": "Deletar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('mensagem de sucesso', () => pm.expect(pm.response.text()).to.eql('Categoria deletada com sucesso!'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/categoria/deletarPorId/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Deletar segunda categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/categoria/deletarPorId/{{categoriaId2}}"
+          }
+        },
+        {
+          "name": "Buscar por ID deletada -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('não encontrada', () => pm.expect(pm.response.json().message).to.include('não encontrada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorId/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Deletar de novo -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('não encontrada', () => pm.expect(pm.response.json().message).to.include('não encontrada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/categoria/deletarPorId/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Atualizar categoria deletada -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400', () => pm.response.to.have.status(400));",
+                  "pm.test('não encontrada', () => pm.expect(pm.response.json().message).to.include('não encontrada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{categoriaId}},\n  \"nome\": \"Qualquer\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/atualizar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Erros (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400', () => pm.response.to.have.status(400));",
+              "pm.test('tem mensagem', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Cadastrar sem nome",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Cadastrar com nome em branco",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"   \"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Cadastrar com JSON inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"nome\": "
+            },
+            "url": "{{baseUrl}}/api/categoria/cadastrar"
+          }
+        },
+        {
+          "name": "Atualizar sem id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sem id\"\n}"
+            },
+            "url": "{{baseUrl}}/api/categoria/atualizar"
+          }
+        },
+        {
+          "name": "Buscar por ID inexistente",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorId/999999999"
+          }
+        },
+        {
+          "name": "Buscar por ID não numérico",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorId/abc"
+          }
+        },
+        {
+          "name": "Buscar por nome sem parâmetro",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/buscarPorNome"
+          }
+        },
+        {
+          "name": "Deletar ID inexistente",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/categoria/deletarPorId/999999999"
+          }
+        },
+        {
+          "name": "Paginado page=-1",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?page=-1"
+          }
+        },
+        {
+          "name": "Paginado size=0",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?size=0"
+          }
+        },
+        {
+          "name": "Paginado size=101 (acima do máximo)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?size=101"
+          }
+        },
+        {
+          "name": "Paginado sort=empresa (fora da whitelist)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?sort=empresa"
+          }
+        },
+        {
+          "name": "Paginado direction=cima",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?direction=cima"
+          }
+        },
+        {
+          "name": "Paginado page=abc (tipo inválido)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/paginado?page=abc"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Segurança (401)",
+      "item": [
+        {
+          "name": "Listar sem token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/listar"
+          }
+        },
+        {
+          "name": "Listar com token inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "token.invalido.abc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categoria/listar"
+          }
+        }
+      ]
+    }
+  ]
+}
