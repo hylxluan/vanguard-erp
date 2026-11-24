@@ -146,16 +146,18 @@ public class GlobalExceptionsHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ResponseApi> messageNotReadableExceptions(HttpMessageNotReadableException ex, HttpServletRequest request) {
         logException(ex, request);
-        StringBuilder msgErro = new StringBuilder();
+        String msgErro;
 
-        if (ex.getMessage().startsWith("Required request body is missing")) {
-            msgErro.append("Os dados da requisição não foram enviados.");
+        if (ex.getMessage() != null && ex.getMessage().startsWith("Required request body is missing")) {
+            msgErro = "Os dados da requisição não foram enviados.";
+        } else {
+            msgErro = "O JSON da requisição está malformado ou possui valores com tipo inválido.";
         }
 
         ResponseApi responseApi = new ResponseApi(new Date(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Payload e demais dados não foram enviados corretamente.",
-                msgErro.toString(),
+                msgErro,
                 request.getRequestURI());
 
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(responseApi);
